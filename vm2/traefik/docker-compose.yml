@@ -1,0 +1,28 @@
+services:
+
+  traefik:
+    image: traefik:v3.3
+    container_name: traefik
+    restart: unless-stopped
+    environment:
+      - DOCKER_API_VERSION=1.44
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/tls.yml:/etc/traefik/tls.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/certs:/certs:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_DOMAIN}`)"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.docker.network=traefik-net"
+    networks:
+      - traefik.net
+
+networks:
+  traefik-net:
+    external: true

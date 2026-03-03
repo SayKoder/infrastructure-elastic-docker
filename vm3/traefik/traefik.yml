@@ -1,0 +1,28 @@
+entryPoints:
+  web:
+    address: ":80"
+    # Redirige automatiquement HTTP vers HTTPS
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+# Conn à Docker
+providers:
+  docker:
+    exposedByDefault: false
+    endpoint: "unix:///var/run/docker.sock"
+  file:
+    filename: /etc/traefik/tls.yml
+
+# Dashboard Traefik (interface web)
+api:
+  dashboard: true
+  insecure: false
+
+# Logs
+log:
+  level: INFO

@@ -1,0 +1,85 @@
+services:
+  mariadb-wordpress:
+    image: mariadb:10.11
+    container_name: mariadb-wordpress
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${WORDPRESS_DB_NAME}
+      - MYSQL_USER=${WORDPRESS_DB_USER}
+      - MYSQL_PASSWORD=${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - mariadb-wordpress-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wordpress-net
+  
+  wordpress:
+    image: wordpress:6.4
+    container_name: wordpress
+    restart: unless-stopped
+    entrypoint: ["/bin/bash", "/wordpress-entrypoint.sh"]
+    extra_hosts:
+      - "keycloak.local:192.168.56.103"
+      - "wordpress.local:192.168.56.103"
+    depends_on:
+      mariadb-wordpress:
+        condition: service_healthy
+    environment:
+      - WORDPRESS_DB_HOST=mariadb-wordpress:3306
+      - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
+      - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
+      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - wordpress-data:/var/www/html
+      - /var/log/containers/wordpress:/var/log/apache2
+      - ./monlabo-ca.crt:/usr/local/share/ca-certificates/monlabo-ca.crt:ro
+      - ./wordpress-entrypoint.sh:/wordpress-entrypoint.sh:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wordpress.rule=Host(`${WORDPRESS_DOMAIN}`)"
+      - "traefik.http.routers.wordpress.tls=true"
+      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+    networks:
+      - traefik-net
+      - wordpress-net
+  
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mariadb-wordpress
+      - mariadb-keycloak
+    volumes:
+      - /var/log/containers/phpmyadmin:/var/log/apache2
+    environment:
+      - PMA_HOSTS=mariadb-wordpress,mariadb-keycloak
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`${PHPMYADMIN_DOMAIN}`)"
+      - "traefik.http.routers.phpmyadmin.tls=true"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+      - "traefik.http.routers.phpmyadmin.middlewares=phpmyadmin-auth"
+      - "traefik.http.middlewares.phpmyadmin-auth.basicauth.users=admin:$$apr1$$dPin3aCs$$ABb1wcidRvJLjnCTcKmwU/"
+    networks:
+      - traefik-net
+      - wordpress-net
+      - keycloak-net
+
+volumes:
+  mariadb-wordpress-data:
+  wordpress-data:
+
+networks:
+  traefik-net:
+    external: true
+  wordpress-net:
+    driver: bridge
+  keycloak-net:
+    external: true

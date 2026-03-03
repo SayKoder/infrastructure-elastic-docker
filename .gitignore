@@ -1,0 +1,16 @@
+.env
+**/.env
+
+*.key
+*.crt
+*.pem
+**/*.key
+**/*.crt
+**/*.pem
+
+ca/
+
+*.log
+
+.DS_Store
+Thumbs.db

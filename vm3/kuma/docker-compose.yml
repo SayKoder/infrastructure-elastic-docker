@@ -1,0 +1,36 @@
+services:
+  uptime-kuma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: uptime-kuma-custom:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    extra_hosts:
+      - "wordpress.local:192.168.56.103"
+      - "phpmyadmin.local:192.168.56.103"
+      - "keycloak.local:192.168.56.103"
+      - "traefik.apps.local:192.168.56.103"
+      - "kibana.local:192.168.56.101"
+      - "traefik.logging.local:192.168.56.101"
+      - "traefik.monitoring.local:192.168.56.102"
+    volumes:
+      - uptime-kuma-data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uptime.rule=Host(`${UPTIME_DOMAIN}`)"
+      - "traefik.http.routers.uptime.tls=true"
+      - "traefik.http.services.uptime.loadbalancer.server.port=3001"
+      - "traefik.docker.network=traefik-net"
+    networks:
+      - traefik-net
+      - kuma-net
+
+volumes:
+  uptime-kuma-data:
+
+networks:
+  traefik-net:
+    external: true
+  kuma-net:
+    driver: bridge

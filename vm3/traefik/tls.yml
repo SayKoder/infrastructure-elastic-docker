@@ -1,0 +1,9 @@
+tls:
+  certificates:
+    - certFile: /certs/vm3.crt
+      keyFile: /certs/vm3.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/vm3.crt
+        keyFile: /certs/vm3.key

@@ -1,0 +1,9 @@
+tls:
+  certificates:
+    - certFile: /certs/vm2.crt
+      keyFile: /certs/vm2.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/vm2.crt
+        keyFile: /certs/vm2.key

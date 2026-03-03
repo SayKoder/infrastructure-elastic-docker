@@ -1,0 +1,17 @@
+services:
+
+  filebeat:
+    image: elastic/filebeat:8.12.0
+    container_name: filebeat
+    restart: unless-stopped
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true

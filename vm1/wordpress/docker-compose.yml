@@ -11,8 +11,8 @@ services:
     volumes:
       - mariadb-wordpress-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      start_period: 10s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      start_period: 30s
       interval: 10s
       timeout: 5s
       retries: 5
@@ -45,6 +45,7 @@ services:
       - "traefik.http.routers.wordpress.rule=Host(`${WORDPRESS_DOMAIN}`)"
       - "traefik.http.routers.wordpress.tls=true"
       - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik-net"
     networks:
       - traefik-net
       - wordpress-net
@@ -55,7 +56,6 @@ services:
     restart: unless-stopped
     depends_on:
       - mariadb-wordpress
-      - mariadb-keycloak
     volumes:
       - /var/log/containers/phpmyadmin:/var/log/apache2
     environment:
@@ -67,6 +67,7 @@ services:
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
       - "traefik.http.routers.phpmyadmin.middlewares=phpmyadmin-auth"
       - "traefik.http.middlewares.phpmyadmin-auth.basicauth.users=admin:$$apr1$$dPin3aCs$$ABb1wcidRvJLjnCTcKmwU/"
+      - "traefik.docker.network=traefik-net"
     networks:
       - traefik-net
       - wordpress-net

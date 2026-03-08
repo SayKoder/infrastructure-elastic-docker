@@ -49,7 +49,7 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - LS_JAVA_OPTS=-Xms256m -Xmx256m
     volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - "5044:5044"
     networks:

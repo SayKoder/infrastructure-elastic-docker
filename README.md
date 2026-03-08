@@ -64,37 +64,37 @@ Ce projet déploie une architecture distribuée de services conteneurisés sur \
 
 └──────────────┬───────────────┬───────────────┬──────────────┘
 
-&nbsp;              │               │               │
+              │               │               │
 
-&nbsp;       XXX.XXX.XX.103   XXX.XXX.XX.101   XXX.XXX.XX.102
+       XXX.XXX.XX.103   XXX.XXX.XX.101   XXX.XXX.XX.102
 
-&nbsp;              │               │               │
+              │               │               │
 
-&nbsp;       ┌──────▼──────┐  ┌─────▼──────┐  ┌────▼────────┐
+       ┌──────▼──────┐  ┌─────▼──────┐  ┌────▼────────┐
 
-&nbsp;       │    VM1      │  │    VM2     │  │    VM3      │
+       │    VM1      │  │    VM2     │  │    VM3      │
 
-&nbsp;       │    Apps     │  │  Logging   │  │ Monitoring  │
+       │    Apps     │  │  Logging   │  │ Monitoring  │
 
-&nbsp;       │─────────────│  │────────────│  │─────────────│
+       │─────────────│  │────────────│  │─────────────│
 
-&nbsp;       │  Traefik    │  │  Traefik   │  │  Traefik    │
+       │  Traefik    │  │  Traefik   │  │  Traefik    │
 
-&nbsp;       │  WordPress  │  │  Elastic   │  │  Uptime     │
+       │  WordPress  │  │  Elastic   │  │  Uptime     │
 
-&nbsp;       │  MariaDB x2 │  │  Logstash  │  │  Kuma       │
+       │  MariaDB x2 │  │  Logstash  │  │  Kuma       │
 
-&nbsp;       │  Keycloak   │  │  Kibana    │  └─────────────┘
+       │  Keycloak   │  │  Kibana    │  └─────────────┘
 
-&nbsp;       │  phpMyAdmin │  └────────────┘
+       │  phpMyAdmin │  └────────────┘
 
-&nbsp;       │  Filebeat   │       
+       │  Filebeat   │       
 
-&nbsp;       └─────────────┘   
+       └─────────────┘   
 
-&nbsp;             │ logs via Filebeat
+             │ logs via Filebeat
 
-&nbsp;             └──────────────────→ VM2:5044
+             └──────────────────→ VM2:5044
 
 
 ```
@@ -389,9 +389,6 @@ bash ~/projet/scripts/setup-vm1.sh
 ```bash
 
 \# Sur VM2
-
-git clone https://github.com/SayKoder/infrastructure-elastic-docker.git
-
 \# Crée les .env (voir étape 2)
 
 bash ~/projet/scripts/setup-vm2.sh
@@ -407,24 +404,15 @@ bash ~/projet/scripts/setup-vm2.sh
 ```bash
 
 \# Sur VM3
-
-git clone https://github.com/SayKoder/infrastructure-elastic-docker.git
-
 \# Crée les .env (voir étape 2)
 
 bash ~/projet/scripts/setup-vm3.sh
 
 ```
 
-
-
 \### Étape 7 - Configurer Keycloak
 
-
-
 Dans l'Administration Console (`https://keycloak.local`) :
-
-
 
 1\. Crée un Realm `monlabo`
 
@@ -436,6 +424,7 @@ Dans l'Administration Console (`https://keycloak.local`) :
 
 5\. Dans WordPress -> Réglages -> OpenID Connect, renseigne le Client ID et Secret
 
+Si une maintenance word press est affiché : docker exec wordpress rm -f /var/www/html/.maintenance
 
 
 ---
